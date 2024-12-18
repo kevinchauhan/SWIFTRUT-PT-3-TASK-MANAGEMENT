@@ -101,4 +101,14 @@ export class AuthController {
             res.status(500).json({ success: false, message: "Internal server error" });
         }
     }
+
+    async self(req, res, next) {
+        try {
+            console.log(req.user)
+            const user = await User.findById(req.user.id)
+            return res.json(user)
+        } catch (error) {
+            return next(error)
+        }
+    }
 }

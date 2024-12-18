@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import auth from './routes/auth.js';
 import db from './config/db.js';
+import { Config } from './config/index.js';
 
 const app = express();
 const corsOptions = {
@@ -15,6 +17,7 @@ const corsOptions = {
 
 db()
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
