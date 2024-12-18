@@ -1,6 +1,17 @@
+import { Route, Routes } from "react-router-dom"
+import Navbar from "./components/Navbar"
+import Signup from "./pages/Signup"
+import { ToastContainer } from "react-toastify"
+
 const App = () => {
   return (
-    <div className="bg-orange-800">App</div>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+      <ToastContainer />
+    </>
   )
 }
 
