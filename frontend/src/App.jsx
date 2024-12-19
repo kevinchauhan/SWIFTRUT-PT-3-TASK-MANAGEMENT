@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import axios from "axios";
 import useAuthStore from "./store/authStore";  // Zustand store to manage global state
 import HomePage from "./pages/Home";
+import ForgotPassword from "./pages/ForgotPasswrod";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () => {
   const setUser = useAuthStore((state) => state.setUser);  // Function to set user in global state
@@ -41,6 +43,8 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route
           path="/dashboard"
           element={

@@ -81,7 +81,11 @@ const Login = () => {
                     />
                     {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
                 </div>
-
+                <div className="my-4 text-end">
+                    <p className="text-sm text-primary">
+                        <Link to="/forgot-password" className="text-accent hover:underline"> Forgot Password?</Link>
+                    </p>
+                </div>
                 {/* Submit Button */}
                 <button
                     type="submit"

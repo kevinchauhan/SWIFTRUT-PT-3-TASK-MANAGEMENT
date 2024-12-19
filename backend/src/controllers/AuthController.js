@@ -1,6 +1,9 @@
 import bcryptjs from 'bcryptjs';
+import crypto from 'crypto';
 import User from '../models/User.js';
+import nodemailer from 'nodemailer'
 import { generateTokenAndSetCookie } from '../utils/generateToken.js';
+import { Config } from '../config/index.js';
 
 export class AuthController {
     async signup(req, res) {
@@ -41,7 +44,7 @@ export class AuthController {
                 image,
             });
 
-            await generateTokenAndSetCookie(newUser._id, res);
+            // await generateTokenAndSetCookie(newUser._id, res);
             await newUser.save();
 
             res.status(201).json({
@@ -113,4 +116,84 @@ export class AuthController {
             return next(error)
         }
     }
+
+    async forgotPassword(req, res) {
+        try {
+
+            const { email } = req.body;
+
+            // Find user by email
+            const user = await User.findOne({ email });
+            if (!user) {
+                return res.status(400).send("No account found with that email address.");
+            }
+
+            // Create a password reset token
+            const token = crypto.randomBytes(20).toString("hex");
+
+            // Set token to expire in 1 hour
+            user.resetPasswordToken = token;
+            user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+            // Save the token to the database
+            await user.save();
+
+            // Send the password reset link to the user's email
+            const resetLink = `${Config.FRONTEND_URL}/reset-password?token=${token}`;
+
+            const transporter = nodemailer.createTransport({
+                service: "gmail", // Or any other email service
+                auth: {
+                    user: Config.EMAIL_USER, // Your email address
+                    pass: Config.EMAIL_PASSWORD, // Your email password or app-specific password
+                },
+            });
+
+            const mailOptions = {
+                to: user.email,
+                from: Config.EMAIL_USER,
+                subject: "Password Reset Request",
+                text: `You have requested a password reset. Please click the following link to reset your password: ${resetLink}`,
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error)
+                    return res.status(500).json({ success: false, message: "Error sending email" });
+                }
+                return res.status(200).send("Password reset link has been sent to your email.");
+            });
+
+        } catch (error) {
+            console.log("Error in forgot controller", error);
+            res.status(500).json({ success: false, message: "Internal server error" });
+        }
+    };
+
+    async resetPassword(req, res) {
+        const { token, newPassword } = req.body;
+
+        // Find user by reset token and check if it has expired
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() },
+        });
+
+        if (!user) {
+            return res.status(400).send("Invalid or expired token.");
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcryptjs.hash(newPassword, 10);
+
+        // Update user's password and clear reset token fields
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+
+        res.status(200).send("Password has been reset successfully.");
+    };
+
 }
