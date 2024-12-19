@@ -8,6 +8,8 @@ const TaskCard = ({ task, onEdit, fetchTasks }) => {
     const { user } = useAuthStore();
     const [status, setStatus] = useState(task.status); // Use `status` from the task schema
 
+    const isOverdue = moment().isAfter(moment(task.dueDate)) && status !== "completed";
+
     // Handle status change
     const handleStatusChange = async (newStatus) => {
         try {
@@ -47,14 +49,20 @@ const TaskCard = ({ task, onEdit, fetchTasks }) => {
     };
 
     return (
-        <div className="p-4 bg-white shadow-md rounded-md">
+        <div className="relative p-4 bg-white shadow-md rounded-md">
+            {/* Overdue Badge */}
+            {isOverdue && (
+                <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
+                    Overdue
+                </div>
+            )}
+
             <h3 className="text-lg font-medium text-primary">{task.title}</h3>
             <p className="text-sm text-gray-600">{task.description}</p>
 
             <p className="text-sm text-gray-400">
                 Due: {moment(task.dueDate).format("DD/MM/YY")}
             </p>
-
 
             {/* Status Dropdown */}
             <div className="mt-2 flex items-center">
@@ -74,19 +82,28 @@ const TaskCard = ({ task, onEdit, fetchTasks }) => {
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-4 flex space-x-4 justify-end">
-                <button
-                    onClick={() => onEdit(task)}
-                    className="py-1 px-4 bg-blue-500 text-white rounded-md"
-                >
-                    Edit
-                </button>
-                <button
-                    onClick={handleDelete}
-                    className="py-1 px-4 bg-red-500 text-white rounded-md"
-                >
-                    Delete
-                </button>
+            <div className="mt-4 flex space-x-4 justify-between">
+                {user?.role === "admin" && (
+                    <p className="text-sm text-gray-800 mt-2">
+                        <span className="mr-2 font-medium text-sm">Username:</span>
+                        {task.userId?.name}
+                    </p>
+                )}
+
+                <div>
+                    <button
+                        onClick={() => onEdit(task)}
+                        className="py-1 px-4 bg-blue-500 mr-2 text-white rounded-md"
+                    >
+                        Edit
+                    </button>
+                    <button
+                        onClick={handleDelete}
+                        className="py-1 px-4 bg-red-500 text-white rounded-md"
+                    >
+                        Delete
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -104,8 +104,10 @@ export class AuthController {
 
     async self(req, res, next) {
         try {
-            console.log(req.user)
             const user = await User.findById(req.user.id)
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
             return res.json(user)
         } catch (error) {
             return next(error)

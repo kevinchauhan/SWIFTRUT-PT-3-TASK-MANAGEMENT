@@ -23,7 +23,7 @@ const App = () => {
         });
 
         // If user is logged in, set user data in Zustand
-        setUser(response.data.user);
+        setUser(response.data);
         setIsLoggedIn(true);  // Set logged-in state to true
       } catch (error) {
         console.error("Not authenticated or session expired", error);

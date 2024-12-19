@@ -1,7 +1,7 @@
 import { useLayoutEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import { toast } from 'react-toastify';
 
@@ -108,7 +108,7 @@ const Signup = () => {
             <div className="mt-4 text-center">
                 <p className="text-sm text-primary">
                     Already have an account?
-                    <a href="/login" className="text-accent hover:underline"> Login here</a>
+                    <Link to="/login" className="text-accent hover:underline"> Login here</Link>
                 </p>
             </div>
         </div>

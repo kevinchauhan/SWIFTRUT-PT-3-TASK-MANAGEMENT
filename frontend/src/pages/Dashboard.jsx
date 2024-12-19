@@ -50,7 +50,6 @@ const Dashboard = () => {
             setLoading(false);
         }
     };
-    console.log(tasks)
     // Open modal for creating or editing a task
     const openModal = (task = { title: "", description: "" }) => {
         setSelectedTask(task);
@@ -133,14 +132,16 @@ const Dashboard = () => {
             ) : (
                 <div>
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-medium text-primary">Your Tasks</h2>
-
-                        <button
-                            onClick={() => openModal()}
-                            className="py-2 px-4 bg-accent text-white rounded-md hover:bg-primary"
-                        >
-                            Add New Task
-                        </button>
+                        <h2 className="text-2xl font-medium text-primary">{user.role === 'admin' ? 'All user tasks' : 'Your Tasks'}</h2>
+                        {
+                            user?.role === 'admin' ? '' :
+                                <button
+                                    onClick={() => openModal()}
+                                    className="py-2 px-4 bg-accent text-white rounded-md hover:bg-primary"
+                                >
+                                    Add New Task
+                                </button>
+                        }
                     </div>
 
                     {/* Filter and Sort Tabs */}
@@ -164,20 +165,22 @@ const Dashboard = () => {
                             Pending
                         </button>
 
-                        <div className="ml-4 flex">
-                            <button
-                                onClick={() => setSortBy("ascending")}
-                                className={`py-2 px-4 ${sortBy === "ascending" ? "bg-primary text-white" : "bg-gray-200"}`}
+                        <div className="ml-4 flex items-center">
+                            <label htmlFor="sortBy" className="mr-2 text-sm font-semibold">
+                                Sort By:
+                            </label>
+                            <select
+                                id="sortBy"
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                                className="py-2 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                             >
-                                Sort by Due Date (Asc)
-                            </button>
-                            <button
-                                onClick={() => setSortBy("descending")}
-                                className={`py-2 px-4 ml-2 ${sortBy === "descending" ? "bg-primary text-white" : "bg-gray-200"}`}
-                            >
-                                Sort by Due Date (Desc)
-                            </button>
+                                <option value="none">None</option>
+                                <option value="ascending">Due Date (Ascending)</option>
+                                <option value="descending">Due Date (Descending)</option>
+                            </select>
                         </div>
+
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -22,7 +22,7 @@ const taskSchema = new mongoose.Schema(
             type: Date,
             required: [true, "Task due date is required"],
         },
-        createdBy: {
+        userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,

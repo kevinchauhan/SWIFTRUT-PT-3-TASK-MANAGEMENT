@@ -1,15 +1,14 @@
 import { useLayoutEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import { toast } from 'react-toastify';
 
 const Login = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [loading, setLoading] = useState(false);  // State to track loading status
-    const setUser = useAuthStore((state) => state.setUser);
-    const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+    const { setUser, isLoggedIn, setIsLoggedIn } = useAuthStore();
     const navigate = useNavigate();
 
 
@@ -28,7 +27,7 @@ const Login = () => {
             console.log(response.data)
             // Set the user data in global state
             setUser(response.data.user);
-
+            setIsLoggedIn(true)
             // Show success toast
             toast.success("Login Successful!",);
 
@@ -101,7 +100,7 @@ const Login = () => {
             <div className="mt-4 text-center">
                 <p className="text-sm text-primary">
                     Dont have an account?
-                    <a href="/signup" className="text-accent hover:underline"> Sign up here</a>
+                    <Link to="/signup" className="text-accent hover:underline"> Sign up here</Link>
                 </p>
             </div>
         </div>

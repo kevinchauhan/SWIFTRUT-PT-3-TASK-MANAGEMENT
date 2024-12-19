@@ -1,9 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import useAuthStore from '../store/authStore';
+import axios from 'axios';
 
 const Navbar = () => {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { user, logout } = useAuthStore()
 
+    const handleLogout = async () => {
+        await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/logout`, {}, { withCredentials: true });
+        setMobileMenuOpen(false);
+        logout();
+    }
     return (
         <nav className="bg-secondary text-primary px-6 py-4 shadow-md">
             <div className="container mx-auto flex items-center justify-between">
@@ -14,18 +22,28 @@ const Navbar = () => {
 
                 {/* Desktop Links */}
                 <div className="hidden md:flex space-x-8">
-                    <Link to="/dashboard" className="hover:text-accent transition-all duration-300">
+                    {/* <Link to="/dashboard" className="hover:text-accent transition-all duration-300">
                         Dashboard
-                    </Link>
-                    <Link to="/admin" className="hover:text-accent transition-all duration-300">
-                        Admin Panel
-                    </Link>
-                    <Link to="/login" className="hover:text-accent transition-all duration-300">
-                        Login
-                    </Link>
-                    <Link to="/signup" className="hover:text-accent transition-all duration-300">
-                        Signup
-                    </Link>
+                    </Link> */}
+                    {user ?
+                        <>
+                            <span>Hello, {user.name}</span>
+                            <button onClick={handleLogout} className="hover:text-accent transition-all duration-300">
+                                Logout
+                            </button>
+                        </>
+                        :
+                        <>
+                            <Link to="/login" className="hover:text-accent transition-all duration-300">
+                                Login
+                            </Link>
+                            <Link to="/signup" className="hover:text-accent transition-all duration-300">
+                                Signup
+                            </Link>
+                        </>
+                    }
+
+
                 </div>
 
                 {/* Mobile Menu Button */}

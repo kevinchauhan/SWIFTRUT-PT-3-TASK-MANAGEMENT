@@ -1,4 +1,5 @@
 import Task from "../models/Task.js";
+import User from "../models/User.js";
 
 class TaskController {
     // Create a new task
@@ -6,7 +7,7 @@ class TaskController {
         const { title, description, dueDate } = req.body;
 
         try {
-            const userTasks = await Task.countDocuments({ createdBy: req.user.id });
+            const userTasks = await Task.countDocuments({ userId: req.user.id });
 
             // Restrict regular users to creating a maximum of 10 tasks
             if (req.user.role === "User" && userTasks >= 10) {
@@ -18,7 +19,7 @@ class TaskController {
                 description,
                 dueDate,
                 status: "pending",
-                createdBy: req.user.id,
+                userId: req.user.id,
             });
 
             await task.save();
@@ -33,11 +34,12 @@ class TaskController {
         const { status, sortBy, sortOrder = "asc", dueDate, search, page = 1, limit = 10 } = req.query;
 
         try {
+            const user = await User.findById(req.user.id)
             // Build query filter
-            const filter = { createdBy: req.user.id };
+            const filter = user.role === "admin" ? {} : { userId: req.user.id };
             if (status) filter.status = status;
-            if (dueDate) filter.dueDate = { $lte: new Date(dueDate) }; // Tasks with dueDate <= specified date
-            if (search) filter.title = { $regex: search, $options: "i" }; // Case-insensitive search in title
+            if (dueDate) filter.dueDate = { $lte: new Date(dueDate) };
+            if (search) filter.title = { $regex: search, $options: "i" };
 
             // Build sorting object
             const sort = sortBy ? { [sortBy]: sortOrder === "desc" ? -1 : 1 } : {};
@@ -49,7 +51,8 @@ class TaskController {
             const tasks = await Task.find(filter)
                 .sort(sort)
                 .skip(skip)
-                .limit(Number(limit));
+                .limit(Number(limit))
+                .populate('userId');
 
             // Total task count for pagination metadata
             const totalTasks = await Task.countDocuments(filter);
@@ -71,7 +74,7 @@ class TaskController {
         const { id } = req.params;
 
         try {
-            const task = await Task.findOne({ _id: id, createdBy: req.user.id });
+            const task = await Task.findOne({ _id: id, userId: req.user.id });
             if (!task) return res.status(404).json({ message: "Task not found" });
             res.status(200).json(task);
         } catch (error) {
@@ -85,7 +88,7 @@ class TaskController {
 
         try {
             const task = await Task.findOneAndUpdate(
-                { _id: id, createdBy: req.user.id },
+                { _id: id, userId: req.user.id },
                 req.body,
                 { new: true }
             );
@@ -102,7 +105,7 @@ class TaskController {
         const { id } = req.params;
 
         try {
-            const task = await Task.findOneAndDelete({ _id: id, createdBy: req.user.id });
+            const task = await Task.findOneAndDelete({ _id: id, userId: req.user.id });
             if (!task) return res.status(404).json({ message: "Task not found" });
             res.status(200).json({ message: "Task deleted successfully" });
         } catch (error) {
