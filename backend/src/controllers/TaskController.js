@@ -17,7 +17,7 @@ class TaskController {
                 title,
                 description,
                 dueDate,
-                status: "Pending",
+                status: "pending",
                 createdBy: req.user.id,
             });
 
@@ -30,7 +30,7 @@ class TaskController {
 
     // Fetch tasks with advanced querying (filtering and sorting)
     static async getTasks(req, res) {
-        const { status, sortBy, sortOrder = "asc", dueDate, search } = req.query;
+        const { status, sortBy, sortOrder = "asc", dueDate, search, page = 1, limit = 10 } = req.query;
 
         try {
             // Build query filter
@@ -42,12 +42,29 @@ class TaskController {
             // Build sorting object
             const sort = sortBy ? { [sortBy]: sortOrder === "desc" ? -1 : 1 } : {};
 
-            const tasks = await Task.find(filter).sort(sort);
-            res.status(200).json(tasks);
+            // Pagination logic
+            const skip = (page - 1) * limit;
+
+            // Fetch tasks with filter, sorting, and pagination
+            const tasks = await Task.find(filter)
+                .sort(sort)
+                .skip(skip)
+                .limit(Number(limit));
+
+            // Total task count for pagination metadata
+            const totalTasks = await Task.countDocuments(filter);
+
+            res.status(200).json({
+                tasks,
+                totalTasks,
+                totalPages: Math.ceil(totalTasks / limit),
+                currentPage: Number(page),
+            });
         } catch (error) {
             res.status(500).json({ message: "Failed to fetch tasks", error });
         }
     }
+
 
     // Fetch a single task by ID
     static async getTaskById(req, res) {

@@ -15,7 +15,7 @@ const Login = () => {
         setLoading(true);  // Set loading to true when API call starts
         try {
             // API Call to login the user
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/login`, data);
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/login`, data, { withCredentials: true });
             console.log(response.data)
             // Set the user data in global state
             setUser(response.data.user);
