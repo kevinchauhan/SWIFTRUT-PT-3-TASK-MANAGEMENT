@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,16 @@ const Signup = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [loading, setLoading] = useState(false);  // State to track loading status
     const setUser = useAuthStore((state) => state.setUser);
+    const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
     const navigate = useNavigate();
+
+
+    useLayoutEffect(() => {
+        if (isLoggedIn) {
+            navigate('/dashboard')
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoggedIn])
 
     const onSubmit = async (data) => {
         setLoading(true);  // Set loading to true when API call starts

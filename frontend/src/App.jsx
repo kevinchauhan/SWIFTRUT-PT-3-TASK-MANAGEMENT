@@ -42,9 +42,9 @@ const App = () => {
         <Route
           path="/dashboard"
           element={
-            <Dashboard />
-            // <Protected>
-            // </Protected>
+            <Protected>
+              <Dashboard />
+            </Protected>
           }
         />
       </Routes>
