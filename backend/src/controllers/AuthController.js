@@ -153,8 +153,14 @@ export class AuthController {
                 to: user.email,
                 from: Config.EMAIL_USER,
                 subject: "Password Reset Request",
-                text: `You have requested a password reset. Please click the following link to reset your password: ${resetLink}`,
+                html: `
+                    <p>You have requested a password reset. Please click the following link to reset your password:</p>
+                    <a href="${resetLink}" target="_blank" style="color: #ff385c; text-decoration: none; font-weight: bold;">
+                        Reset Password
+                    </a>
+                `,
             };
+
 
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
