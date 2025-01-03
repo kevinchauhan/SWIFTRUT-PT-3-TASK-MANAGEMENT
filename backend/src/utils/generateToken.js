@@ -12,7 +12,7 @@ const generateTokenAndSetCookie = (userId, res) => {
         secure: true,
         maxAge: 24 * 60 * 60,
         path: '/',
-        sameSite: 'None',
+        sameSite: 'none',
     }));
 };
 
